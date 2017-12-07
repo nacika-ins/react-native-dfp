@@ -64,9 +64,11 @@ import { RNBanner } from 'react-native-dfp';
   onAdViewDidDismissScreen={this.props.adViewDidDismissScreen}
   onAdViewWillLeaveApplication={this.props.adViewWillLeaveApplication}
   onAdmobDispatchAppEvent={(event) => admobDispatchAppEvent(event)}
+  customTargeting={customTargeting}
+  adSizes={adSizes}
+  dimensions={dimensions}
   testDeviceID={testDeviceID}
   adUnitID={adUnitID}
-  dimensions={dimensions}
   bannerSize={bannerSize} />
 
 ```
@@ -86,36 +88,47 @@ import { RNBanner } from 'react-native-dfp';
  *
  * banner is default
  */
-bannerSize: React.PropTypes.string,
+ bannerSize: PropTypes.string,
 
-/**
- * Custom banner size (instead of using bannerSize)
- */
-dimensions: PropTypes.shape({
-  height: PropTypes.number,
-  width: PropTypes.number,
-}),
+ /**
+  * Custom banner size (instead of using bannerSize)
+  */
+ dimensions: PropTypes.shape({
+   height: PropTypes.number,
+   width: PropTypes.number,
+ }),
 
-/**
- * DFP ad unit ID
- */
-adUnitID: React.PropTypes.string,
+ /**
+  * Array of some combination of bannerSize and dimensions that are valid for the ad
+  * Example: ['mediumRectangle', { width: 320, height: 400 }, 'smartBannerPortrait']
+  */
+ adSizes: PropTypes.array,
 
-/**
- * Test device ID
- */
-testDeviceID: React.PropTypes.string,
+ /**
+  * Custom targeting params to be sent along with the ad request
+  */
+ customTargeting: PropTypes.object,
 
-/**
- * DFP iOS (?) library events
- */
-adViewDidReceiveAd: React.PropTypes.func,
-didFailToReceiveAdWithError: React.PropTypes.func,
-adViewWillPresentScreen: React.PropTypes.func,
-adViewWillDismissScreen: React.PropTypes.func,
-adViewDidDismissScreen: React.PropTypes.func,
-adViewWillLeaveApplication: React.PropTypes.func,
-admobDispatchAppEvent: React.PropTypes.func,
+ /**
+  * DFP ad unit ID
+  */
+ adUnitID: PropTypes.string,
+
+ /**
+  * Test device ID
+  */
+ testDeviceID: PropTypes.string,
+
+ /**
+  * DFP iOS (?) library events
+  */
+ adViewDidReceiveAd: PropTypes.func,
+ didFailToReceiveAdWithError: PropTypes.func,
+ adViewWillPresentScreen: PropTypes.func,
+ adViewWillDismissScreen: PropTypes.func,
+ adViewDidDismissScreen: PropTypes.func,
+ adViewWillLeaveApplication: PropTypes.func,
+ admobDispatchAppEvent: PropTypes.func,
 ```
 
 ### Display an Interstitial

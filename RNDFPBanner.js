@@ -23,7 +23,7 @@ export default class DFPBanner extends React.Component {
   }
 
   render() {
-    const { adUnitID, testDeviceID, dimensions, style, didFailToReceiveAdWithError, admobDispatchAppEvent } = this.props;
+    const { adUnitID, testDeviceID, dimensions, customTargeting, style, didFailToReceiveAdWithError, admobDispatchAppEvent } = this.props;
     let { bannerSize, adSizes } = this.props;
 
     // Dimensions gets highest priority
@@ -54,6 +54,7 @@ export default class DFPBanner extends React.Component {
           onAdViewDidDismissScreen={this.props.adViewDidDismissScreen}
           onAdViewWillLeaveApplication={this.props.adViewWillLeaveApplication}
           onAdmobDispatchAppEvent={(event) => admobDispatchAppEvent(event)}
+          customTargeting={customTargeting}
           adSizes={adSizes}
           dimensions={dimensions}
           testDeviceID={testDeviceID}
@@ -68,7 +69,7 @@ DFPBanner.propTypes = {
   // style: View.propTypes.style,
 
   /**
-   * AdMob iOS library banner size constants
+   * DFP library banner size constants
    * (https://developers.google.com/admob/ios/banner)
    * banner (320x50, Standard Banner for Phones and Tablets)
    * largeBanner (320x100, Large Banner for Phones and Tablets)
@@ -97,7 +98,12 @@ DFPBanner.propTypes = {
   adSizes: PropTypes.array,
 
   /**
-   * AdMob ad unit ID
+   * Custom targeting params to be sent along with the ad request
+   */
+  customTargeting: PropTypes.object,
+
+  /**
+   * DFP ad unit ID
    */
   adUnitID: PropTypes.string,
 
@@ -107,7 +113,7 @@ DFPBanner.propTypes = {
   testDeviceID: PropTypes.string,
 
   /**
-   * AdMob iOS library events
+   * DFP iOS (?) library events
    */
   adViewDidReceiveAd: PropTypes.func,
   didFailToReceiveAdWithError: PropTypes.func,

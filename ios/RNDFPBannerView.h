@@ -10,6 +10,7 @@
 
 @interface RNDFPBannerView : UIView <GADBannerViewDelegate, GADAdSizeDelegate>
 
+@property (nonatomic, copy) NSDictionary *customTargeting;
 @property (nonatomic, copy) NSArray *adSizes;
 @property (nonatomic, copy) NSDictionary *dimensions;
 @property (nonatomic, copy) NSString *bannerSize;

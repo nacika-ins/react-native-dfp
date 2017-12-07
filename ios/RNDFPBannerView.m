@@ -131,13 +131,17 @@
           _bannerView.validAdSizes = validAdSizes;
         }
 
-        GADRequest *request = [GADRequest request];
+        DFPRequest *request = [DFPRequest request];
         if(_testDeviceID) {
             if([_testDeviceID isEqualToString:@"EMULATOR"]) {
                 request.testDevices = @[kGADSimulatorID];
             } else {
                 request.testDevices = @[_testDeviceID];
             }
+        }
+
+        if (_customTargeting) {
+          request.customTargeting = _customTargeting;
         }
 
         [_bannerView loadRequest:request];
@@ -198,10 +202,22 @@ didReceiveAppEvent:(NSString *)name
         [self loadBanner];
     }
 }
+
 - (void)setTestDeviceID:(NSString *)testDeviceID
 {
     if(![testDeviceID isEqual:_testDeviceID]) {
         _testDeviceID = testDeviceID;
+        if (_bannerView) {
+            [_bannerView removeFromSuperview];
+        }
+        [self loadBanner];
+    }
+}
+
+- (void)setCustomTargeting:(NSDictionary *)customTargeting
+{
+    if(![customTargeting isEqual:_customTargeting]) {
+        _customTargeting = customTargeting;
         if (_bannerView) {
             [_bannerView removeFromSuperview];
         }

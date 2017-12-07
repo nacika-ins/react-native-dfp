@@ -29,6 +29,7 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
 
   public static final String REACT_CLASS = "RNDFPBanner";
 
+  public static final String PROP_CUSTOM_TARGETING = "customTargeting";
   public static final String PROP_AD_SIZES = "adSizes";
   public static final String PROP_DIMENSIONS = "dimensions";
   public static final String PROP_BANNER_SIZE = "bannerSize";
@@ -37,6 +38,7 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
 
   private String testDeviceID = null;
   private String adUnitID = null;
+  private ReadableMap customTargeting = null;
 
   public enum Events {
     EVENT_SIZE_CHANGE("onSizeChange"),
@@ -256,6 +258,11 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
     }
   }
 
+  @ReactProp(name = PROP_CUSTOM_TARGETING)
+  public void setCustomTargeting(final ReactViewGroup view, final ReadableMap customTargeting) {
+    this.customTargeting = customTargeting;
+  }
+
   @ReactProp(name = PROP_AD_UNIT_ID)
   public void setAdUnitID(final ReactViewGroup view, final String adUnitID) {
     this.adUnitID = adUnitID;
@@ -281,6 +288,13 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
           adRequestBuilder = adRequestBuilder.addTestDevice(testDeviceID);
         }
       }
+
+      if (customTargeting != null) {
+        for (Map.Entry<String, Object> target : customTargeting.toHashMap().entrySet()) {
+          adRequestBuilder.addCustomTargeting(target.getKey(), target.getValue().toString());
+        }
+      }
+
       PublisherAdRequest adRequest = adRequestBuilder.build();
       adView.loadAd(adRequest);
     }
