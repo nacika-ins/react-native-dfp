@@ -54,7 +54,7 @@ export default class DFPBanner extends React.Component {
           onAdViewDidDismissScreen={this.props.adViewDidDismissScreen}
           onAdViewWillLeaveApplication={this.props.adViewWillLeaveApplication}
           onAdmobDispatchAppEvent={(event) => admobDispatchAppEvent(event)}
-          customTargeting={customTargeting}
+          // customTargeting={customTargeting}
           adSizes={adSizes}
           dimensions={dimensions}
           testDeviceID={testDeviceID}

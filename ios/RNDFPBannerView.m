@@ -114,21 +114,23 @@
 
         _bannerView = [[DFPBannerView alloc] initWithAdSize:size];
         [_bannerView setAppEventDelegate:self]; //added Admob event dispatch listener
-        // if(!CGRectEqualToRect(self.bounds, _bannerView.bounds)) {
+        NSLog(@"GOOGLE ADS SIZE %f %f", _bannerView.bounds.size.width, _bannerView.bounds.size.height);
+        if(_bannerView.bounds.size.width != 0.0 && _bannerView.bounds.size.height != 0.0) {
+            NSLog(@"GOOGLE ADS SIZE NOT ZERO");
             if (self.onSizeChange) {
                 self.onSizeChange(@{
-                                    @"width": [NSNumber numberWithFloat: _bannerView.bounds.size.width],
-                                    @"height": [NSNumber numberWithFloat: _bannerView.bounds.size.height]
-                                    });
+                    @"width": [NSNumber numberWithFloat: _bannerView.bounds.size.width],
+                    @"height": [NSNumber numberWithFloat: _bannerView.bounds.size.height]
+                });
             }
-        // }
+        }
         _bannerView.delegate = self;
         _bannerView.adSizeDelegate = self;
         _bannerView.adUnitID = _adUnitID;
         _bannerView.rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
 
         if (validAdSizes) {
-          _bannerView.validAdSizes = validAdSizes;
+            _bannerView.validAdSizes = validAdSizes;
         }
 
         DFPRequest *request = [DFPRequest request];
@@ -138,10 +140,12 @@
             } else {
                 request.testDevices = @[_testDeviceID];
             }
+        } else {
+            request.testDevices = @[kGADSimulatorID];
         }
 
         if (_customTargeting) {
-          request.customTargeting = _customTargeting;
+            request.customTargeting = _customTargeting;
         }
 
         [_bannerView loadRequest:request];
@@ -229,11 +233,15 @@ didReceiveAppEvent:(NSString *)name
 {
     [super layoutSubviews ];
 
+    NSLog(@"GOOGLE ADS layoutSubviews %f %f", _bannerView.frame.size.width, _bannerView.frame.size.height);
+
     _bannerView.frame = CGRectMake(
-                                   self.bounds.origin.x,
-                                   self.bounds.origin.x,
-                                   _bannerView.frame.size.width,
-                                   _bannerView.frame.size.height);
+        self.bounds.origin.x,
+        self.bounds.origin.x,
+        _bannerView.frame.size.width,
+        _bannerView.frame.size.height
+    );
+
     [self addSubview:_bannerView];
 }
 
