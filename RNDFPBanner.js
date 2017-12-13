@@ -13,13 +13,19 @@ export default class DFPBanner extends React.Component {
     super();
     this.onSizeChange = this.onSizeChange.bind(this);
     this.state = {
-      style: {},
+      style: {
+        width: 1,
+        height: 1,
+      },
     };
   }
 
   onSizeChange(event) {
     const { height, width } = event.nativeEvent;
+    console.log('onSizeChange:', event, width, height);
     this.setState({ style: { width, height } });
+
+    console.log(height, width);
   }
 
   render() {
@@ -42,6 +48,8 @@ export default class DFPBanner extends React.Component {
        bannerSize = 'smartBannerPortrait';
     }
 
+    console.log(adUnitID, customTargeting, dimensions, adSizes, bannerSize)
+
     return (
       <View style={this.props.style}>
         <RNBanner
@@ -54,12 +62,13 @@ export default class DFPBanner extends React.Component {
           onAdViewDidDismissScreen={this.props.adViewDidDismissScreen}
           onAdViewWillLeaveApplication={this.props.adViewWillLeaveApplication}
           onAdmobDispatchAppEvent={(event) => admobDispatchAppEvent(event)}
-          // customTargeting={customTargeting}
+          customTargeting={customTargeting}
           adSizes={adSizes}
           dimensions={dimensions}
           testDeviceID={testDeviceID}
           adUnitID={adUnitID}
-          bannerSize={bannerSize} />
+          bannerSize={bannerSize}
+        />
       </View>
     );
   }

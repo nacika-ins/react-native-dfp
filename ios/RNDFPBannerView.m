@@ -51,13 +51,13 @@
 }
 
 -(void)loadBanner {
-    if (_adUnitID && (_bannerSize || _dimensions || _adSizes)) {
-        GADAdSize size;
+    if (self.adUnitID && (self.bannerSize || self.dimensions || self.adSizes)) {
+        GADAdSize size = GADAdSizeFromCGSize(CGSizeMake(0.0, 0.0));
         NSMutableArray *validAdSizes;
 
-        if (_dimensions) {
-            NSNumber *width = [RCTConvert NSNumber:_dimensions[@"width"]];
-            NSNumber *height = [RCTConvert NSNumber:_dimensions[@"height"]];
+        if (self.dimensions) {
+            NSNumber *width = [RCTConvert NSNumber:self.dimensions[@"width"]];
+            NSNumber *height = [RCTConvert NSNumber:self.dimensions[@"height"]];
 
             CGFloat widthVal = [width doubleValue];
             CGFloat heightVal = [height doubleValue];
@@ -66,9 +66,9 @@
 
             size = GADAdSizeFromCGSize(cgSize);
         } else {
-            if (_adSizes) {
+            if (self.adSizes) {
                 validAdSizes = [[NSMutableArray alloc] init];
-                for (id anAdSize in _adSizes) {
+                for (id anAdSize in self.adSizes) {
                     GADAdSize aSize;
 
                     // BannerSize
@@ -81,6 +81,7 @@
 
                         // Set size to the first one in the list
                         if (CGSizeEqualToSize(CGSizeFromGADAdSize(size), CGSizeMake(0.0, 0.0))) {
+                            NSLog(@"CGSizeEqualToSize: %f x %f", aSize.size.width, aSize.size.height);
                             size = aSize;
                         }
                     }
@@ -103,27 +104,21 @@
 
                         // Set size to the first one in the list
                         if (CGSizeEqualToSize(CGSizeFromGADAdSize(size), CGSizeMake(0.0, 0.0))) {
+                            NSLog(@"2nd CGSizeEqualToSize: %f x %f", aSize.size.width, aSize.size.height);
                             size = aSize;
                         }
                     }
                 }
             } else {
-                size = [self getAdSizeFromString:_bannerSize];
+                size = [self getAdSizeFromString:self.bannerSize];
             }
         }
 
+        NSLog(@"GOOGLE ADS INIT SIZE %f %f", size.size.width, size.size.height);
         _bannerView = [[DFPBannerView alloc] initWithAdSize:size];
         [_bannerView setAppEventDelegate:self]; //added Admob event dispatch listener
-        NSLog(@"GOOGLE ADS SIZE %f %f", _bannerView.bounds.size.width, _bannerView.bounds.size.height);
-        if(_bannerView.bounds.size.width != 0.0 && _bannerView.bounds.size.height != 0.0) {
-            NSLog(@"GOOGLE ADS SIZE NOT ZERO");
-            if (self.onSizeChange) {
-                self.onSizeChange(@{
-                    @"width": [NSNumber numberWithFloat: _bannerView.bounds.size.width],
-                    @"height": [NSNumber numberWithFloat: _bannerView.bounds.size.height]
-                });
-            }
-        }
+        NSLog(@"GOOGLE ADS SIZE %f %f %f %f", _bannerView.bounds.size.width, _bannerView.bounds.size.height, self.bounds.size.width, self.bounds.size.height);
+
         _bannerView.delegate = self;
         _bannerView.adSizeDelegate = self;
         _bannerView.adUnitID = _adUnitID;
@@ -134,18 +129,20 @@
         }
 
         DFPRequest *request = [DFPRequest request];
-        if(_testDeviceID) {
-            if([_testDeviceID isEqualToString:@"EMULATOR"]) {
+        if(self.testDeviceID) {
+            if([self.testDeviceID isEqualToString:@"EMULATOR"]) {
                 request.testDevices = @[kGADSimulatorID];
             } else {
-                request.testDevices = @[_testDeviceID];
+                request.testDevices = @[self.testDeviceID];
             }
         } else {
             request.testDevices = @[kGADSimulatorID];
         }
 
-        if (_customTargeting) {
-            request.customTargeting = _customTargeting;
+        // NSLog(@"GOOGLE ADS %d %@", _customTargeting != NULL, _customTargeting);
+        // if (_customTargeting && _customTargeting != NULL && [_customTargeting count] > 0) {
+        if (self.customTargeting) {
+            request.customTargeting = self.customTargeting;
         }
 
         [_bannerView loadRequest:request];
@@ -165,24 +162,24 @@ didReceiveAppEvent:(NSString *)name
 
 - (void)setAdSizes:(NSArray *)adSizes
 {
-    if(![adSizes isEqual:_adSizes]) {
+     if(![adSizes isEqualToArray:_adSizes]) {
         _adSizes = adSizes;
         if (_bannerView) {
             [_bannerView removeFromSuperview];
         }
         [self loadBanner];
-    }
+     }
 }
 
 - (void)setDimensions:(NSDictionary *)dimensions
 {
-    if(![dimensions isEqual:_dimensions]) {
+     if(![dimensions isEqualToDictionary:_dimensions]) {
         _dimensions = dimensions;
         if (_bannerView) {
             [_bannerView removeFromSuperview];
         }
         [self loadBanner];
-    }
+     }
 }
 
 - (void)setBannerSize:(NSString *)bannerSize
@@ -220,13 +217,13 @@ didReceiveAppEvent:(NSString *)name
 
 - (void)setCustomTargeting:(NSDictionary *)customTargeting
 {
-    if(![customTargeting isEqual:_customTargeting]) {
+     if(![customTargeting isEqualToDictionary:_customTargeting]) {
         _customTargeting = customTargeting;
         if (_bannerView) {
             [_bannerView removeFromSuperview];
         }
         [self loadBanner];
-    }
+     }
 }
 
 -(void)layoutSubviews
@@ -242,6 +239,19 @@ didReceiveAppEvent:(NSString *)name
         _bannerView.frame.size.height
     );
 
+     if(!CGRectEqualToRect(self.bounds, _bannerView.bounds)) {
+//    if (_bannerView.bounds.size.width > 1.0f && _bannerView.bounds.size.height > 1.0f) {
+//
+//        NSLog(@"equalToRect");
+        if (self.onSizeChange) {
+            NSLog(@"GOOGLE ADS onSizeChange");
+            self.onSizeChange(@{
+                                @"width": [NSNumber numberWithFloat: _bannerView.bounds.size.width],
+                                @"height": [NSNumber numberWithFloat: _bannerView.bounds.size.height]
+                                });
+        }
+    }
+
     [self addSubview:_bannerView];
 }
 
@@ -253,6 +263,7 @@ didReceiveAppEvent:(NSString *)name
 /// Called before the ad view changes to the new size.
 - (void)adView:(DFPBannerView *)bannerView
 willChangeAdSizeTo:(GADAdSize)size {
+    NSLog(@"willChangeAddSizeTo %f x %f", size.size.width, size.size.height);
     if (self.onWillChangeAdSizeTo) {
         // bannerView calls this method on its adSizeDelegate object before the banner updates it size,
         // allowing the application to adjust any views that may be affected by the new ad size.
