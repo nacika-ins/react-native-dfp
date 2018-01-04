@@ -114,6 +114,7 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
         adView.measure(width, height);
         adView.layout(left, top, left + width, top + height);
         mEventEmitter.receiveEvent(view.getId(), Events.EVENT_RECEIVE_AD.toString(), null);
+        triggerSizeChange(view, adView);
       }
 
       @Override
@@ -152,6 +153,13 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
         mEventEmitter.receiveEvent(view.getId(), Events.EVENT_WILL_LEAVE_APP.toString(), null);
       }
     });
+  }
+
+  protected void triggerSizeChange(ReactViewGroup viewGroup, PublisherAdView adView) {
+    WritableMap event = Arguments.createMap();
+    event.putDouble("width", adView.getAdSize().getWidth());
+    event.putDouble("height", adView.getAdSize().getHeight());
+    mEventEmitter.receiveEvent(viewGroup.getId(), Events.EVENT_SIZE_CHANGE.toString(), event);
   }
 
   @Override
@@ -195,10 +203,7 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
       newAdView.setAdUnitId(adUnitID);
 
       // send measurements to js to style the AdView in react
-      WritableMap event = Arguments.createMap();
-      event.putDouble("width", newAdView.getAdSize().getWidth());
-      event.putDouble("height", newAdView.getAdSize().getHeight());
-      mEventEmitter.receiveEvent(view.getId(), Events.EVENT_SIZE_CHANGE.toString(), event);
+      triggerSizeChange(view, newAdView);
 
       loadAd(newAdView);
     }
