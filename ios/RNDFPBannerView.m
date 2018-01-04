@@ -51,7 +51,7 @@
 }
 
 -(void)loadBanner {
-    if (self.adUnitID && (self.bannerSize || self.dimensions || self.adSizes)) {
+    if (self.adUnitID && self.onSizeChange && self.onWillChangeAdSizeTo && (self.bannerSize || self.dimensions || self.adSizes)) {
         GADAdSize size = GADAdSizeFromCGSize(CGSizeMake(0.0, 0.0));
         NSMutableArray *validAdSizes;
 
@@ -118,6 +118,8 @@
         _bannerView = [[DFPBannerView alloc] initWithAdSize:size];
         [_bannerView setAppEventDelegate:self]; //added Admob event dispatch listener
         NSLog(@"GOOGLE ADS SIZE %f %f %f %f", _bannerView.bounds.size.width, _bannerView.bounds.size.height, self.bounds.size.width, self.bounds.size.height);
+        
+        [self triggerOnSizeChange];
 
         _bannerView.delegate = self;
         _bannerView.adSizeDelegate = self;
@@ -129,7 +131,8 @@
         }
 
         DFPRequest *request = [DFPRequest request];
-        if(self.testDeviceID) {
+        
+        if (self.testDeviceID) {
             if([self.testDeviceID isEqualToString:@"EMULATOR"]) {
                 request.testDevices = @[kGADSimulatorID];
             } else {
@@ -158,6 +161,24 @@ didReceiveAppEvent:(NSString *)name
     if (self.onAdmobDispatchAppEvent) {
         self.onAdmobDispatchAppEvent(@{ name: info });
     }
+}
+
+- (void)setOnSizeChange:(RCTBubblingEventBlock)onSizeChange
+{
+    _onSizeChange = onSizeChange;
+    if (_bannerView) {
+        [_bannerView removeFromSuperview];
+    }
+    [self loadBanner];
+}
+
+- (void)setOnWillChangeAdSizeTo:(RCTBubblingEventBlock)onWillChangeAdSizeTo
+{
+    _onWillChangeAdSizeTo = onWillChangeAdSizeTo;
+    if (_bannerView) {
+        [_bannerView removeFromSuperview];
+    }
+    [self loadBanner];
 }
 
 - (void)setAdSizes:(NSArray *)adSizes
@@ -239,10 +260,15 @@ didReceiveAppEvent:(NSString *)name
         _bannerView.frame.size.height
     );
 
-     if(!CGRectEqualToRect(self.bounds, _bannerView.bounds)) {
-//    if (_bannerView.bounds.size.width > 1.0f && _bannerView.bounds.size.height > 1.0f) {
-//
-//        NSLog(@"equalToRect");
+    [self addSubview:_bannerView];
+}
+
+- (void)triggerOnSizeChange
+{
+    if(!CGRectEqualToRect(self.bounds, _bannerView.bounds)) {
+        //    if (_bannerView.bounds.size.width > 1.0f && _bannerView.bounds.size.height > 1.0f) {
+        //
+        //        NSLog(@"equalToRect");
         if (self.onSizeChange) {
             NSLog(@"GOOGLE ADS onSizeChange");
             self.onSizeChange(@{
@@ -251,8 +277,6 @@ didReceiveAppEvent:(NSString *)name
                                 });
         }
     }
-
-    [self addSubview:_bannerView];
 }
 
 - (void)removeFromSuperview
@@ -267,7 +291,10 @@ willChangeAdSizeTo:(GADAdSize)size {
     if (self.onWillChangeAdSizeTo) {
         // bannerView calls this method on its adSizeDelegate object before the banner updates it size,
         // allowing the application to adjust any views that may be affected by the new ad size.
-        self.onWillChangeAdSizeTo(@{});
+        self.onWillChangeAdSizeTo(@{
+                                    @"width": [NSNumber numberWithFloat: size.size.width],
+                                    @"height": [NSNumber numberWithFloat: size.size.height]
+                                    });
     }
 
 }
@@ -277,6 +304,7 @@ willChangeAdSizeTo:(GADAdSize)size {
     if (self.onAdViewDidReceiveAd) {
         self.onAdViewDidReceiveAd(@{});
     }
+    [self triggerOnSizeChange];
 }
 
 /// Tells the delegate an ad request failed.

@@ -14,18 +14,14 @@ export default class DFPBanner extends React.Component {
     this.onSizeChange = this.onSizeChange.bind(this);
     this.state = {
       style: {
-        width: 1,
-        height: 1,
+        flex: 1,
       },
     };
   }
 
   onSizeChange(event) {
     const { height, width } = event.nativeEvent;
-    console.log('onSizeChange:', event, width, height);
     this.setState({ style: { width, height } });
-
-    console.log(height, width);
   }
 
   render() {
@@ -54,7 +50,8 @@ export default class DFPBanner extends React.Component {
       <View style={this.props.style}>
         <RNBanner
           style={this.state.style}
-          onSizeChange={this.onSizeChange.bind(this)}
+          onSizeChange={this.onSizeChange}
+          onWillChangeAdSizeTo={this.onSizeChange}
           onAdViewDidReceiveAd={this.props.adViewDidReceiveAd}
           onDidFailToReceiveAdWithError={(event) => didFailToReceiveAdWithError(event.nativeEvent.error)}
           onAdViewWillPresentScreen={this.props.adViewWillPresentScreen}
