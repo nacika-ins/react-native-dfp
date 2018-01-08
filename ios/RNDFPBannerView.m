@@ -81,7 +81,6 @@
 
                         // Set size to the first one in the list
                         if (CGSizeEqualToSize(CGSizeFromGADAdSize(size), CGSizeMake(0.0, 0.0))) {
-                            NSLog(@"CGSizeEqualToSize: %f x %f", aSize.size.width, aSize.size.height);
                             size = aSize;
                         }
                     }
@@ -104,7 +103,6 @@
 
                         // Set size to the first one in the list
                         if (CGSizeEqualToSize(CGSizeFromGADAdSize(size), CGSizeMake(0.0, 0.0))) {
-                            NSLog(@"2nd CGSizeEqualToSize: %f x %f", aSize.size.width, aSize.size.height);
                             size = aSize;
                         }
                     }
@@ -114,11 +112,9 @@
             }
         }
 
-        NSLog(@"GOOGLE ADS INIT SIZE %f %f", size.size.width, size.size.height);
         _bannerView = [[DFPBannerView alloc] initWithAdSize:size];
         [_bannerView setAppEventDelegate:self]; //added Admob event dispatch listener
-        NSLog(@"GOOGLE ADS SIZE %f %f %f %f", _bannerView.bounds.size.width, _bannerView.bounds.size.height, self.bounds.size.width, self.bounds.size.height);
-        
+
         [self triggerOnSizeChange];
 
         _bannerView.delegate = self;
@@ -142,8 +138,6 @@
             request.testDevices = @[kGADSimulatorID];
         }
 
-        // NSLog(@"GOOGLE ADS %d %@", _customTargeting != NULL, _customTargeting);
-        // if (_customTargeting && _customTargeting != NULL && [_customTargeting count] > 0) {
         if (self.customTargeting) {
             request.customTargeting = self.customTargeting;
         }
@@ -251,8 +245,6 @@ didReceiveAppEvent:(NSString *)name
 {
     [super layoutSubviews ];
 
-    NSLog(@"GOOGLE ADS layoutSubviews %f %f", _bannerView.frame.size.width, _bannerView.frame.size.height);
-
     _bannerView.frame = CGRectMake(
         self.bounds.origin.x,
         self.bounds.origin.x,
@@ -266,11 +258,7 @@ didReceiveAppEvent:(NSString *)name
 - (void)triggerOnSizeChange
 {
     if(!CGRectEqualToRect(self.bounds, _bannerView.bounds)) {
-        //    if (_bannerView.bounds.size.width > 1.0f && _bannerView.bounds.size.height > 1.0f) {
-        //
-        //        NSLog(@"equalToRect");
         if (self.onSizeChange) {
-            NSLog(@"GOOGLE ADS onSizeChange");
             self.onSizeChange(@{
                                 @"width": [NSNumber numberWithFloat: _bannerView.bounds.size.width],
                                 @"height": [NSNumber numberWithFloat: _bannerView.bounds.size.height]
@@ -287,7 +275,6 @@ didReceiveAppEvent:(NSString *)name
 /// Called before the ad view changes to the new size.
 - (void)adView:(DFPBannerView *)bannerView
 willChangeAdSizeTo:(GADAdSize)size {
-    NSLog(@"willChangeAddSizeTo %f x %f", size.size.width, size.size.height);
     if (self.onWillChangeAdSizeTo) {
         // bannerView calls this method on its adSizeDelegate object before the banner updates it size,
         // allowing the application to adjust any views that may be affected by the new ad size.

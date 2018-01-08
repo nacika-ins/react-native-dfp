@@ -44,8 +44,6 @@ export default class DFPBanner extends React.Component {
        bannerSize = 'smartBannerPortrait';
     }
 
-    console.log(adUnitID, customTargeting, dimensions, adSizes, bannerSize)
-
     return (
       <View style={this.props.style}>
         <RNBanner
