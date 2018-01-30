@@ -51,7 +51,7 @@
 }
 
 -(void)loadBanner {
-    if (self.adUnitID && self.onSizeChange && self.onWillChangeAdSizeTo && (self.bannerSize || self.dimensions || self.adSizes)) {
+    if (self.adUnitID && self.customTargeting && self.onSizeChange && self.onWillChangeAdSizeTo && (self.bannerSize || self.dimensions || self.adSizes)) {
         GADAdSize size = GADAdSizeFromCGSize(CGSizeMake(0.0, 0.0));
         NSMutableArray *validAdSizes;
 
@@ -127,7 +127,7 @@
         }
 
         DFPRequest *request = [DFPRequest request];
-        
+
         if (self.testDeviceID) {
             if([self.testDeviceID isEqualToString:@"EMULATOR"]) {
                 request.testDevices = @[kGADSimulatorID];
