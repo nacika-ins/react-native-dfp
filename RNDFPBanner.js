@@ -25,8 +25,8 @@ export default class DFPBanner extends React.Component {
   }
 
   render() {
-    const { adUnitID, testDeviceID, dimensions, customTargeting, style, didFailToReceiveAdWithError, admobDispatchAppEvent } = this.props;
-    let { bannerSize, adSizes } = this.props;
+    const { adUnitID, testDeviceID, dimensions, style, didFailToReceiveAdWithError, admobDispatchAppEvent } = this.props;
+    let { bannerSize, adSizes, customTargeting } = this.props;
 
     // Dimensions gets highest priority
     if (dimensions && dimensions.width && dimensions.height) {
@@ -42,6 +42,10 @@ export default class DFPBanner extends React.Component {
     // Default to something if nothing is set
     if (!bannerSize && (!dimensions || !dimensions.width || !dimensions.height) && (!adSizes || !adSizes.length > 0)) {
        bannerSize = 'smartBannerPortrait';
+    }
+
+    if (!customTargeting || Object.keys(customTargeting).length === 0) {
+        customTargeting = {}
     }
 
     return (

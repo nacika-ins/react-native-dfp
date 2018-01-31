@@ -13,7 +13,6 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.facebook.react.views.view.ReactViewGroup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.doubleclick.AppEventListener;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -25,7 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> implements AppEventListener {
+public class RNDfpBannerViewManager extends SimpleViewManager<RNDfpReactViewGroup> implements AppEventListener {
+  private static final String TAG = RNDfpBannerViewManager.class.getSimpleName();
 
   public static final String REACT_CLASS = "RNDFPBanner";
 
@@ -37,8 +37,6 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
   public static final String PROP_TEST_DEVICE_ID = "testDeviceID";
 
   private String testDeviceID = null;
-  private String adUnitID = null;
-  private ReadableMap customTargeting = null;
 
   public enum Events {
     EVENT_SIZE_CHANGE("onSizeChange"),
@@ -81,16 +79,16 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
   }
 
   @Override
-  protected ReactViewGroup createViewInstance(ThemedReactContext themedReactContext) {
+  protected RNDfpReactViewGroup createViewInstance(ThemedReactContext themedReactContext) {
     mThemedReactContext = themedReactContext;
     mEventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
-    ReactViewGroup view = new ReactViewGroup(themedReactContext);
+    RNDfpReactViewGroup view = new RNDfpReactViewGroup(themedReactContext);
     attachNewAdView(view);
     return view;
    }
 
   int viewID = -1;
-  protected void attachNewAdView(final ReactViewGroup view) {
+  protected void attachNewAdView(final RNDfpReactViewGroup view) {
     final PublisherAdView adView = new PublisherAdView(mThemedReactContext);
     adView.setAppEventListener(this);
     // destroy old AdView if present
@@ -101,7 +99,7 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
     attachEvents(view);
   }
 
-  protected void attachEvents(final ReactViewGroup view) {
+  protected void attachEvents(final RNDfpReactViewGroup view) {
     viewID = view.getId();
     final PublisherAdView adView = (PublisherAdView) view.getChildAt(0);
     adView.setAdListener(new AdListener() {
@@ -155,7 +153,7 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
     });
   }
 
-  protected void triggerSizeChange(ReactViewGroup viewGroup, PublisherAdView adView) {
+  protected void triggerSizeChange(RNDfpReactViewGroup viewGroup, PublisherAdView adView) {
     WritableMap event = Arguments.createMap();
     event.putDouble("width", adView.getAdSize().getWidth());
     event.putDouble("height", adView.getAdSize().getHeight());
@@ -173,7 +171,7 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
   }
 
   @ReactProp(name = PROP_AD_SIZES)
-  public void setAdSizes(final ReactViewGroup view, final ReadableArray adSizesProp) {
+  public void setAdSizes(final RNDfpReactViewGroup view, final ReadableArray adSizesProp) {
     if (adSizesProp != null) {
       ArrayList<AdSize> adSizesArrayList = new ArrayList<AdSize>();
       for (Object obj : adSizesProp.toArrayList()) {
@@ -200,17 +198,16 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
       attachNewAdView(view);
       PublisherAdView newAdView = (PublisherAdView) view.getChildAt(0);
       newAdView.setAdSizes(adSizes);
-      newAdView.setAdUnitId(adUnitID);
 
       // send measurements to js to style the AdView in react
       triggerSizeChange(view, newAdView);
 
-      loadAd(newAdView);
+      loadAd(view, newAdView);
     }
   }
 
   @ReactProp(name = PROP_DIMENSIONS)
-  public void setDimensions(final ReactViewGroup view, final ReadableMap dimensions) {
+  public void setDimensions(final RNDfpReactViewGroup view, final ReadableMap dimensions) {
     if (dimensions != null && dimensions.hasKey("width") && !dimensions.isNull("width") && dimensions.hasKey("height") && !dimensions.isNull("height")) {
       AdSize adSize = new AdSize(dimensions.getInt("width"), dimensions.getInt("height"));
       AdSize[] adSizes = new AdSize[1];
@@ -219,7 +216,6 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
       attachNewAdView(view);
       PublisherAdView newAdView = (PublisherAdView) view.getChildAt(0);
       newAdView.setAdSizes(adSizes);
-      newAdView.setAdUnitId(adUnitID);
 
       // send measurements to js to style the AdView in react
       WritableMap event = Arguments.createMap();
@@ -227,12 +223,12 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
       event.putDouble("height", adSize.getHeight());
       mEventEmitter.receiveEvent(view.getId(), Events.EVENT_SIZE_CHANGE.toString(), event);
 
-      loadAd(newAdView);
+      loadAd(view, newAdView);
     }
   }
 
   @ReactProp(name = PROP_BANNER_SIZE)
-  public void setBannerSize(final ReactViewGroup view, final String sizeString) {
+  public void setBannerSize(final RNDfpReactViewGroup view, final String sizeString) {
     if (sizeString != null && !sizeString.isEmpty()) {
       AdSize adSize = getAdSizeFromString(sizeString);
       AdSize[] adSizes = new AdSize[1];
@@ -241,7 +237,6 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
       attachNewAdView(view);
       PublisherAdView newAdView = (PublisherAdView) view.getChildAt(0);
       newAdView.setAdSizes(adSizes);
-      newAdView.setAdUnitId(adUnitID);
 
       // send measurements to js to style the AdView in react
       int width;
@@ -259,30 +254,35 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
       event.putDouble("height", height);
       mEventEmitter.receiveEvent(view.getId(), Events.EVENT_SIZE_CHANGE.toString(), event);
 
-      loadAd(newAdView);
+      loadAd(view, newAdView);
     }
   }
 
   @ReactProp(name = PROP_CUSTOM_TARGETING)
-  public void setCustomTargeting(final ReactViewGroup view, final ReadableMap customTargeting) {
-    this.customTargeting = customTargeting;
+  public void setCustomTargeting(final RNDfpReactViewGroup view, final ReadableMap customTargeting) {
+    view.setCustomTargeting(customTargeting);
+    PublisherAdView adView = (PublisherAdView) view.getChildAt(0);
+    loadAd(view, adView);
   }
 
   @ReactProp(name = PROP_AD_UNIT_ID)
-  public void setAdUnitID(final ReactViewGroup view, final String adUnitID) {
-    this.adUnitID = adUnitID;
+  public void setAdUnitID(final RNDfpReactViewGroup view, final String adUnitID) {
+    view.setAdUnitId(adUnitID);
+    PublisherAdView adView = (PublisherAdView) view.getChildAt(0);
+    loadAd(view, adView);
   }
 
   @ReactProp(name = PROP_TEST_DEVICE_ID)
-  public void setPropTestDeviceID(final ReactViewGroup view, final String testDeviceID) {
+  public void setPropTestDeviceID(final RNDfpReactViewGroup view, final String testDeviceID) {
     this.testDeviceID = testDeviceID;
+    PublisherAdView adView = (PublisherAdView) view.getChildAt(0);
+    loadAd(view, adView);
   }
 
-  private void loadAd(final PublisherAdView adView) {
-    if (adView.getAdSizes() != null && adUnitID != null) {
-
-      if (adUnitID != adView.getAdUnitId()) {
-        adView.setAdUnitId(adUnitID);
+  private void loadAd(RNDfpReactViewGroup view, final PublisherAdView adView) {
+    if (adView.getAdSizes() != null && view.getAdUnitId() != null && view.getCustomTargeting() != null) {
+      if (adView.getAdUnitId() == null) {
+        adView.setAdUnitId(view.getAdUnitId());
       }
 
       PublisherAdRequest.Builder adRequestBuilder = new PublisherAdRequest.Builder();
@@ -294,10 +294,8 @@ public class RNDfpBannerViewManager extends SimpleViewManager<ReactViewGroup> im
         }
       }
 
-      if (customTargeting != null) {
-        for (Map.Entry<String, Object> target : customTargeting.toHashMap().entrySet()) {
-          adRequestBuilder.addCustomTargeting(target.getKey(), target.getValue().toString());
-        }
+      for (Map.Entry<String, Object> target : view.getCustomTargeting().toHashMap().entrySet()) {
+        adRequestBuilder.addCustomTargeting(target.getKey(), target.getValue().toString());
       }
 
       PublisherAdRequest adRequest = adRequestBuilder.build();
