@@ -21,9 +21,14 @@ RCT_EXPORT_MODULE();
     return dispatch_get_main_queue();
 }
 
+RCT_EXPORT_VIEW_PROPERTY(customTargeting, NSDictionary);
+RCT_EXPORT_VIEW_PROPERTY(adSizes, NSArray);
+RCT_EXPORT_VIEW_PROPERTY(dimensions, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(bannerSize, NSString);
 RCT_EXPORT_VIEW_PROPERTY(adUnitID, NSString);
 RCT_EXPORT_VIEW_PROPERTY(testDeviceID, NSString);
+
+RCT_EXPORT_VIEW_PROPERTY(onWillChangeAdSizeTo, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onSizeChange, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdmobDispatchAppEvent, RCTBubblingEventBlock)

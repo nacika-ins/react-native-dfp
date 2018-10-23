@@ -13,7 +13,9 @@ export default class DFPBanner extends React.Component {
     super();
     this.onSizeChange = this.onSizeChange.bind(this);
     this.state = {
-      style: {},
+      style: {
+        flex: 1,
+      },
     };
   }
 
@@ -23,12 +25,35 @@ export default class DFPBanner extends React.Component {
   }
 
   render() {
-    const { adUnitID, testDeviceID, bannerSize, style, didFailToReceiveAdWithError,admobDispatchAppEvent } = this.props;
+    const { adUnitID, testDeviceID, dimensions, style, didFailToReceiveAdWithError, admobDispatchAppEvent } = this.props;
+    let { bannerSize, adSizes, customTargeting } = this.props;
+
+    // Dimensions gets highest priority
+    if (dimensions && dimensions.width && dimensions.height) {
+      bannerSize = undefined;
+      adSizes = undefined;
+    }
+
+    // AdSizes gets second priority
+    if (adSizes && adSizes.length > 0) {
+      bannerSize = undefined;
+    }
+
+    // Default to something if nothing is set
+    if (!bannerSize && (!dimensions || !dimensions.width || !dimensions.height) && (!adSizes || !adSizes.length > 0)) {
+       bannerSize = 'smartBannerPortrait';
+    }
+
+    if (!customTargeting || Object.keys(customTargeting).length === 0) {
+        customTargeting = {}
+    }
+
     return (
       <View style={this.props.style}>
         <RNBanner
           style={this.state.style}
-          onSizeChange={this.onSizeChange.bind(this)}
+          onSizeChange={this.onSizeChange}
+          onWillChangeAdSizeTo={this.onSizeChange}
           onAdViewDidReceiveAd={this.props.adViewDidReceiveAd}
           onDidFailToReceiveAdWithError={(event) => didFailToReceiveAdWithError(event.nativeEvent.error)}
           onAdViewWillPresentScreen={this.props.adViewWillPresentScreen}
@@ -36,9 +61,13 @@ export default class DFPBanner extends React.Component {
           onAdViewDidDismissScreen={this.props.adViewDidDismissScreen}
           onAdViewWillLeaveApplication={this.props.adViewWillLeaveApplication}
           onAdmobDispatchAppEvent={(event) => admobDispatchAppEvent(event)}
+          customTargeting={customTargeting}
+          adSizes={adSizes}
+          dimensions={dimensions}
           testDeviceID={testDeviceID}
           adUnitID={adUnitID}
-          bannerSize={bannerSize} />
+          bannerSize={bannerSize}
+        />
       </View>
     );
   }
@@ -48,7 +77,7 @@ DFPBanner.propTypes = {
   // style: View.propTypes.style,
 
   /**
-   * AdMob iOS library banner size constants
+   * DFP library banner size constants
    * (https://developers.google.com/admob/ios/banner)
    * banner (320x50, Standard Banner for Phones and Tablets)
    * largeBanner (320x100, Large Banner for Phones and Tablets)
@@ -63,7 +92,26 @@ DFPBanner.propTypes = {
   bannerSize: PropTypes.string,
 
   /**
-   * AdMob ad unit ID
+   * Custom banner size (instead of using bannerSize)
+   */
+  dimensions: PropTypes.shape({
+    height: PropTypes.number,
+    width: PropTypes.number,
+  }),
+
+  /**
+   * Array of some combination of bannerSize and dimensions that are valid for the ad
+   * Example: ['mediumRectangle', { width: 320, height: 400 }, 'smartBannerPortrait']
+   */
+  adSizes: PropTypes.array,
+
+  /**
+   * Custom targeting params to be sent along with the ad request
+   */
+  customTargeting: PropTypes.object,
+
+  /**
+   * DFP ad unit ID
    */
   adUnitID: PropTypes.string,
 
@@ -73,7 +121,7 @@ DFPBanner.propTypes = {
   testDeviceID: PropTypes.string,
 
   /**
-   * AdMob iOS library events
+   * DFP iOS (?) library events
    */
   adViewDidReceiveAd: PropTypes.func,
   didFailToReceiveAdWithError: PropTypes.func,
@@ -86,7 +134,6 @@ DFPBanner.propTypes = {
 };
 
 DFPBanner.defaultProps = {
-    bannerSize: 'smartBannerPortrait',
     didFailToReceiveAdWithError: () => {},
     admobDispatchAppEvent: () => {}
 };
