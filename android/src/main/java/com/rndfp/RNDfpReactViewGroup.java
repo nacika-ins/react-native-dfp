@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package com.rndfp;
 
 import android.content.Context;
 
