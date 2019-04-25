@@ -32,6 +32,7 @@
 		1A37580F1F2134A300C57EA5 /* RNDFPBannerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDFPBannerManager.m; sourceTree = "<group>"; };
 		1A4F8F221F2B655C0096A4A6 /* RNDFPInterstitial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNDFPInterstitial.h; sourceTree = "<group>"; };
 		1A4F8F231F2B655C0096A4A6 /* RNDFPInterstitial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDFPInterstitial.m; sourceTree = "<group>"; };
+		A14C42F720C09F3400FC9B0E /* GoogleMobileAds.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleMobileAds.framework; path = "../Pods/Google-Mobile-Ads-SDK/Frameworks/frameworks/GoogleMobileAds.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,7 +64,16 @@
 				1A3758081F212AEB00C57EA5 /* RNDFPBannerView.h */,
 				1A3758091F212AEB00C57EA5 /* RNDFPBannerView.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				A14C42F620C09F3300FC9B0E /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		A14C42F620C09F3300FC9B0E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A14C42F720C09F3400FC9B0E /* GoogleMobileAds.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -150,6 +160,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FOR_ENGINEER = "このプロジェクトは、外部依存するファイルが多く各種ファイルに個別で対応するためにejectされた状態になっています。\n\n広告を配信するためのプロジェクトです。";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -191,6 +202,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FOR_ENGINEER = "このプロジェクトは、外部依存するファイルが多く各種ファイルに個別で対応するためにejectされた状態になっています。\n\n広告を配信するためのプロジェクトです。";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -200,6 +212,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -208,14 +221,19 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../ios/Pods/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../../ios/Pods/Google-Mobile-Ads-SDK/Frameworks/frameworks/",
+					"$(SRCROOT)/../../ios/Pods/Google-Mobile-Ads-SDK/Frameworks/frameworks/GoogleMobileAds.framework",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
+					"$(SRCROOT)/../Pods/React/**",
 					"$(SRCROOT)/../../react-native/React/**",
+					"$(SRCROOT)/../../ios/Pods/Google-Mobile-Ads-SDK/Frameworks/frameworks/",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNDfp;
 				SKIP_INSTALL = YES;
@@ -225,14 +243,19 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../ios/Pods/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../../ios/Pods/Google-Mobile-Ads-SDK/Frameworks/frameworks/",
+					"$(SRCROOT)/../../ios/Pods/Google-Mobile-Ads-SDK/Frameworks/frameworks/GoogleMobileAds.framework",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
+					"$(SRCROOT)/../Pods/React/**",
 					"$(SRCROOT)/../../react-native/React/**",
+					"$(SRCROOT)/../../ios/Pods/Google-Mobile-Ads-SDK/Frameworks/frameworks/",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNDfp;
 				SKIP_INSTALL = YES;
